@@ -1,5 +1,6 @@
 package com.example.HospitalManagement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 
@@ -32,6 +33,7 @@ public class Patient {
     @OneToMany(mappedBy ="patient",cascade = CascadeType.ALL)
     private List<Phone> phones;
 
+    @JsonIgnore
     @OneToMany(mappedBy ="patient",cascade = CascadeType.ALL)
     private List<Address> addresses;
 

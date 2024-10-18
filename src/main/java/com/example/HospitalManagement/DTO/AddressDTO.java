@@ -5,8 +5,12 @@ public class AddressDTO {
     private String street;
     private String city;
     private String state;
-    private long pincode;
     private String country;
+    private String pincode; // Changed to String to handle leading zeros
+    private Integer doctorId; // Changed to Integer to avoid nullability issues
+    private Integer patientId; // Changed to Integer to avoid nullability issues
+
+    // Getters and Setters
 
     public int getId() {
         return id;
@@ -40,11 +44,11 @@ public class AddressDTO {
         this.state = state;
     }
 
-    public long getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(long pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
@@ -54,5 +58,35 @@ public class AddressDTO {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public Integer getDoctorId() {
+        return doctorId;
+    }
+
+    public void setDoctorId(Integer doctorId) {
+        this.doctorId = doctorId;
+    }
+
+    public Integer getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(Integer patientId) {
+        this.patientId = patientId;
+    }
+
+    @Override
+    public String toString() {
+        return "AddressDTO{" +
+                "id=" + id +
+                ", street='" + street + '\'' +
+                ", city='" + city + '\'' +
+                ", state='" + state + '\'' +
+                ", country='" + country + '\'' +
+                ", pincode='" + pincode + '\'' +
+                ", doctorId=" + doctorId +
+                ", patientId=" + patientId +
+                '}';
     }
 }

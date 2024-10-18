@@ -5,12 +5,14 @@ import com.example.HospitalManagement.DTO.PhoneDTO;
 import com.example.HospitalManagement.service.AddressService;
 import com.example.HospitalManagement.service.PhoneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/phone")
+@PreAuthorize("hasAuthority('admin')")
+@RequestMapping("/api/phone")
 public class PhoneController {
 
     @Autowired

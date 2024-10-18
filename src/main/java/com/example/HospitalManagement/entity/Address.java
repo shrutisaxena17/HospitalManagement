@@ -15,22 +15,22 @@ public class Address {
 
     private String state;
 
-    private long pincode;
+    private String pincode;
 
     private String country;
 
-    @ManyToOne
-    @JoinColumn(name="doctor_id",nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="doctor_id", nullable = true)
     private Doctor doctor;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_id", nullable = true)
-    private Patient  patient;
+    private Patient patient;
 
     public Address() {
     }
 
-    public Address(int id, String street, String city, String state, long pincode, String country) {
+    public Address(int id, String street, String city, String state, String pincode, String country) {
         this.id = id;
         this.street = street;
         this.city = city;
@@ -71,11 +71,11 @@ public class Address {
         this.state = state;
     }
 
-    public long getPincode() {
+    public String getPincode() {
         return pincode;
     }
 
-    public void setPincode(long pincode) {
+    public void setPincode(String pincode) {
         this.pincode = pincode;
     }
 
@@ -93,5 +93,13 @@ public class Address {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public Patient getPatient() {
+        return patient;
     }
 }

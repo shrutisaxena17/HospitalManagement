@@ -1,15 +1,13 @@
 package com.example.HospitalManagement.controller;
 import com.example.HospitalManagement.DTO.DoctorDTO;
-import com.example.HospitalManagement.entity.Doctor;
 import com.example.HospitalManagement.exception.IdNotFoundException;
 import com.example.HospitalManagement.service.DoctorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/*
 @Controller
 @RequestMapping("/doctor")
 public class DoctorController {
@@ -62,3 +60,59 @@ public class DoctorController {
         }
     }
 }
+*/
+
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+@RestController
+@RequestMapping("/api/doctor")
+@PreAuthorize("hasAuthority('admin')")
+public class DoctorController {
+
+    @Autowired
+    private DoctorService doctorService;
+
+    // GET all doctors
+    @GetMapping
+    public ResponseEntity<List<DoctorDTO>> getAllDoctors() {
+        List<DoctorDTO> doctors = doctorService.getAllDoctors();
+        return new ResponseEntity<>(doctors, HttpStatus.OK);
+    }
+
+    // Add a new doctor
+    @PostMapping("/add")
+    public ResponseEntity<String> addDoctor(@RequestBody DoctorDTO doctorDTO) {
+        doctorService.saveDoctor(doctorDTO);
+        return new ResponseEntity<>("Doctor added successfully!", HttpStatus.CREATED);
+    }
+
+    // Delete a doctor by ID
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteDoctorById(@PathVariable int id) {
+        doctorService.deleteDoctorById(id);
+        return new ResponseEntity<>("Doctor deleted successfully!", HttpStatus.OK);
+    }
+
+    // Update doctor information by ID
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateDoctor(@PathVariable int id, @RequestBody DoctorDTO doctorDTO) {
+        doctorDTO.setId(id);
+        doctorService.saveDoctor(doctorDTO);
+        return new ResponseEntity<>("Doctor updated successfully!", HttpStatus.OK);
+    }
+
+    // Get a doctor by ID
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('receptionist') or hasAuthority('admin')")
+    public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable int id) {
+        DoctorDTO doctor = doctorService.getDoctorById(id);
+        if (doctor != null) {
+            return new ResponseEntity<>(doctor, HttpStatus.OK);
+        } else {
+            throw new IdNotFoundException("Doctor doesn't exist with id " + id);
+        }
+    }
+}
+

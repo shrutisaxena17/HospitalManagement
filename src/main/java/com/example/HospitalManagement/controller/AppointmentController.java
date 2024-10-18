@@ -5,12 +5,14 @@ import com.example.HospitalManagement.DTO.DoctorDTO;
 import com.example.HospitalManagement.exception.IdNotFoundException;
 import com.example.HospitalManagement.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
 @Controller
 @RequestMapping("/appointment")
 public class AppointmentController {
@@ -56,6 +58,59 @@ public class AppointmentController {
             return "appointment-details";
         } else {
             throw new IdNotFoundException("Appointment doesn't exist for id"+id);
+        }
+    }
+}
+*/
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+@RestController
+@RequestMapping("/api/appointment")
+@PreAuthorize("hasAuthority('receptionist')")// Changed to API-based route
+public class AppointmentController {
+
+    @Autowired
+    private AppointmentService appointmentService;
+
+    // GET all appointments
+    @GetMapping
+    public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
+        List<AppointmentDTO> appointments = appointmentService.getAllAppointment();
+        return new ResponseEntity<>(appointments, HttpStatus.OK);
+    }
+
+    // Add a new appointment
+    @PostMapping("/add")
+    public ResponseEntity<String> addAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+        appointmentService.saveAppointment(appointmentDTO);
+        return new ResponseEntity<>("Appointment added successfully!", HttpStatus.CREATED);
+    }
+
+    // Update an appointment by ID
+    @PutMapping("/update/{id}")
+    public ResponseEntity<String> updateAppointment(@PathVariable int id, @RequestBody AppointmentDTO appointmentDTO) {
+        appointmentDTO.setId(id);
+        appointmentService.saveAppointment(appointmentDTO);
+        return new ResponseEntity<>("Appointment updated successfully!", HttpStatus.OK);
+    }
+
+    // Delete an appointment by ID
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteAppointmentById(@PathVariable int id) {
+        appointmentService.deleteAppointmentById(id);
+        return new ResponseEntity<>("Appointment deleted successfully!", HttpStatus.OK);
+    }
+
+    // Get an appointment by ID
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('doctor') or hasAuthority('patient') or hasAuthority('receptionist')")
+    public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable int id) {
+        AppointmentDTO appointment = appointmentService.getAppointmentById(id);
+        if (appointment != null) {
+            return new ResponseEntity<>(appointment, HttpStatus.OK);
+        } else {
+            throw new IdNotFoundException("Appointment doesn't exist with id " + id);
         }
     }
 }

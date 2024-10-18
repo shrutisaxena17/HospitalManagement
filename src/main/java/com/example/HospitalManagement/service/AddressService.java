@@ -15,26 +15,59 @@ import java.util.stream.Collectors;
 public class AddressService {
 
     @Autowired
-    AddressRepo addressRepo;
+    private AddressRepo addressRepo;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
-    public List<AddressDTO> getAllAddress(){
-        List<Address> addressList= addressRepo.findAll();
-        List<AddressDTO> addressDTOList=addressList.stream()
-                .map(address -> modelMapper.map(address,AddressDTO.class))
+    public List<AddressDTO> getAllAddress() {
+        List<Address> addressList = addressRepo.findAll();
+        return addressList.stream()
+                .map(address -> modelMapper.map(address, AddressDTO.class))
                 .collect(Collectors.toList());
-        return addressDTOList;
     }
 
-    public AddressDTO getAddressById(int id){
-        Optional<Address> address=addressRepo.findById(id);
-        AddressDTO addressDTO = modelMapper.map(address,AddressDTO.class);
-        return addressDTO;
+    public AddressDTO getAddressById(int id) {
+        Optional<Address> optionalAddress = addressRepo.findById(id);
+        if (optionalAddress.isPresent()) {
+            return modelMapper.map(optionalAddress.get(), AddressDTO.class);
+        } else {
+            // Handle the case where the address is not found
+            throw new RuntimeException("Address not found for ID: " + id);
+            // Or return null, or create a custom exception to handle this
+        }
     }
 
-    public void deleteAddressById(int id){
-        addressRepo.deleteById(id);
+    public void deleteAddressById(int id) {
+        if (addressRepo.existsById(id)) {
+            addressRepo.deleteById(id);
+        } else {
+            throw new RuntimeException("Address not found for ID: " + id);
+        }
+    }
+
+    public AddressDTO createAddress(AddressDTO addressDTO) {
+        Address address = modelMapper.map(addressDTO, Address.class);
+        Address savedAddress = addressRepo.save(address);
+        return modelMapper.map(savedAddress, AddressDTO.class);
+    }
+
+    public AddressDTO updateAddress(int id, AddressDTO addressDTO) {
+        Optional<Address> optionalAddress = addressRepo.findById(id);
+        if (optionalAddress.isPresent()) {
+            Address addressToUpdate = optionalAddress.get();
+            // Update fields as necessary, using addressDTO
+            addressToUpdate.setStreet(addressDTO.getStreet());
+            addressToUpdate.setCity(addressDTO.getCity());
+            addressToUpdate.setState(addressDTO.getState());
+            addressToUpdate.setCountry(addressDTO.getCountry());
+            addressToUpdate.setPincode(addressDTO.getPincode());
+            // Add more fields if necessary
+
+            Address updatedAddress = addressRepo.save(addressToUpdate);
+            return modelMapper.map(updatedAddress, AddressDTO.class);
+        } else {
+            throw new RuntimeException("Address not found for ID: " + id);
+        }
     }
 }
